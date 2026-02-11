@@ -2,91 +2,135 @@
 <html lang="lt">
 <head>
   <meta charset="UTF-8" />
-  <title>Alimentų indeksavimo skaičiuoklė</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vaiko išlaikymo indeksavimo skaičiuoklė</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fa;
-      padding: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f0f2f5; /* FB stiliaus fonas */
+      padding: 16px;
+      margin: 0;
     }
     .calculator {
-      max-width: 420px;
+      max-width: 480px;
+      margin: 0 auto;
       background: #ffffff;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     h1 {
       font-size: 20px;
-      margin-bottom: 15px;
+      margin-bottom: 16px;
+      text-align: center;
+      color: #1877f2; /* Facebook mėlyna */
     }
     label {
       display: block;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
+      margin-top: 14px;
+      font-weight: 600;
       font-size: 14px;
     }
-    button {
-      margin-top: 15px;
+    input, select {
       width: 100%;
       padding: 10px;
-      font-size: 15px;
-      background: #1976d2;
+      margin-top: 6px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccd0d5;
+    }
+    button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background: #1877f2;
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      font-weight: 600;
     }
     button:hover {
-      background: #125aa0;
+      background: #145dbf;
     }
     .result {
-      margin-top: 15px;
-      padding: 10px;
-      background: #e3f2fd;
-      border-radius: 4px;
+      margin-top: 18px;
+      padding: 14px;
+      background: #e7f3ff;
+      border-radius: 8px;
       font-size: 16px;
-      font-weight: bold;
+      font-weight: 600;
+      text-align: center;
     }
     .note {
-      margin-top: 10px;
+      margin-top: 14px;
       font-size: 12px;
-      color: #555;
+      color: #606770;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
 
 <div class="calculator">
-  <h1>Vaiko išlaikymo indeksavimo skaičiuoklė</h1>
+  <h1>Alimentų indeksavimo skaičiuoklė</h1>
 
   <label for="amount">Dabartinė alimentų suma (€)</label>
   <input type="number" id="amount" placeholder="Pvz. 150" />
 
+  <label for="year">Indeksavimo metai</label>
+  <select id="year"></select>
+
   <label for="vki">Vartotojų kainų indeksas (VKI)</label>
-  <input type="number" step="0.1" id="vki" placeholder="Pvz. 103.4" />
+  <input type="number" step="0.1" id="vki" />
 
   <button onclick="calculate()">Skaičiuoti</button>
 
   <div id="result" class="result" style="display:none;"></div>
 
   <div class="note">
-    Indeksavimas taikomas nuo vasario 1 d., jei nuo sprendimo ar paskutinio keitimo praėjo daugiau nei 6 mėn.
+    <strong>Pastaba:</strong> Skaičiuoklė yra informacinio pobūdžio. Indeksavimas taikomas nuo vasario 1 d., jei nuo teismo sprendimo ar paskutinio išlaikymo dydžio pakeitimo praėjo daugiau nei 6 mėnesiai.
   </div>
 </div>
 
 <script>
+  // Oficialūs VKI (gruodžio mėn.) – pavyzdiniai duomenys
+  // Jei reikės, galima lengvai papildyti naujais metais
+  const vkiData = {
+    2020: 101.1,
+    2021: 104.7,
+    2022: 121.7,
+    2023: 108.5,
+    2024: 102.9
+  };
+
+  const yearSelect = document.getElementById('year');
+  const vkiInput = document.getElementById('vki');
+
+  // Užpildome metų pasirinkimą
+  Object.keys(vkiData).sort((a,b) => b - a).forEach(year => {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  });
+
+  // Automatiškai nustatome VKI pagal metus
+  yearSelect.addEventListener('change', () => {
+    const selectedYear = yearSelect.value;
+    vkiInput.value = vkiData[selectedYear];
+  });
+
+  // Nustatome pradinę reikšmę
+  yearSelect.dispatchEvent(new Event('change'));
+
   function calculate() {
     const amount = parseFloat(document.getElementById('amount').value);
-    const vki = parseFloat(document.getElementById('vki').value);
+    const vki = parseFloat(vkiInput.value);
 
     if (isNaN(amount) || isNaN(vki)) {
-      alert('Prašome įvesti teisingus skaičius');
+      alert('Prašome įvesti teisingus duomenis');
       return;
     }
 
