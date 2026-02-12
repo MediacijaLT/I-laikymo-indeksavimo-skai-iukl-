@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vaiko išlaikymo indeksavimo skaičiuoklė</title>
+  <title>Vaiko išlaikymo (alimentų) indeksavimo skaičiuoklė</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background: #f0f2f5; /* FB stiliaus fonas */
+      background: #f0f2f5; /* Facebook tipo fonas */
       padding: 16px;
       margin: 0;
     }
@@ -90,39 +90,48 @@
   <div id="result" class="result" style="display:none;"></div>
 
   <div class="note">
-    <strong>Pastaba:</strong> Skaičiuoklė yra informacinio pobūdžio. Indeksavimas taikomas nuo vasario 1 d., jei nuo teismo sprendimo ar paskutinio išlaikymo dydžio pakeitimo praėjo daugiau nei 6 mėnesiai.
+    <strong>Pastaba:</strong> Metai nurodo indeksavimo metus. Skaičiavimui naudojamas praėjusių metų gruodžio mėn. oficialus vartotojų kainų indeksas (VKI), skelbiamas Oficialiosios statistikos portale. Indeksavimas taikomas nuo vasario 1 d., jei nuo teismo sprendimo ar paskutinio išlaikymo dydžio pakeitimo praėjo daugiau nei 6 mėnesiai.
   </div>
 </div>
 
 <script>
-  // Oficialūs VKI (gruodžio mėn.) – pavyzdiniai duomenys
-  // Jei reikės, galima lengvai papildyti naujais metais
+  /*
+    OFICIALŪS VKI PERIODINĖMS IŠMOKOMS INDEKSUOTI
+    Šaltinis: https://osp.stat.gov.lt
+    Reikšmės – palyginti su praėjusių metų gruodžio mėn.
+    Metai žemiau = INDEKSAVIMO METAI (vasario 1 d.)
+  */
+
   const vkiData = {
-    2020: 101.1,
-    2021: 104.7,
-    2022: 121.7,
-    2023: 108.5,
-    2024: 102.9
+    2020: 100.2,  // 2019M12
+    2021: 110.6,  // 2020M12
+    2022: 121.7,  // 2021M12
+    2023: 101.2,  // 2022M12
+    2024: 102.1,  // 2023M12
+    2025: 102.1,  // 2024M12
+    2026: 103.4   // 2025M12
   };
 
   const yearSelect = document.getElementById('year');
   const vkiInput = document.getElementById('vki');
 
-  // Užpildome metų pasirinkimą
-  Object.keys(vkiData).sort((a,b) => b - a).forEach(year => {
-    const option = document.createElement('option');
-    option.value = year;
-    option.textContent = year;
-    yearSelect.appendChild(option);
-  });
+  // Užpildome metų pasirinkimą (nuo naujausių)
+  Object.keys(vkiData)
+    .sort((a, b) => b - a)
+    .forEach(year => {
+      const option = document.createElement('option');
+      option.value = year;
+      option.textContent = year;
+      yearSelect.appendChild(option);
+    });
 
-  // Automatiškai nustatome VKI pagal metus
+  // Automatiškai nustatome VKI pagal pasirinktus metus
   yearSelect.addEventListener('change', () => {
     const selectedYear = yearSelect.value;
     vkiInput.value = vkiData[selectedYear];
   });
 
-  // Nustatome pradinę reikšmę
+  // Nustatome pradinę būseną
   yearSelect.dispatchEvent(new Event('change'));
 
   function calculate() {
